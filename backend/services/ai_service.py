@@ -48,22 +48,28 @@ def generate_fake_questions(job_description):
 
     return questions
 
-def generate_ai_questions(job_description):
+def generate_ai_questions(job_description, resume, level):
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     prompt = f"""
     You are an AI interview coach.
 
-    The candidate is applying for the following position:
-
+    Job description:
     {job_description}
 
-    Generate 5 interview questions that are specifically relevant
-    to this position.
+    Candidate resume:
+    {resume}
+
+    Candidate level:
+    {level}
+
+    Generate 5 interview questions tailored to both the job description
+    and the candidate's experience.
+
+    Adjust the difficulty based on the candidate level.
 
     Return only the questions, one question per line.
     """
-
     response = client.responses.create(
         model="gpt-6-astra",
         input=prompt
@@ -72,8 +78,8 @@ def generate_ai_questions(job_description):
     return response.output_text
 
 
-def generate_questions(job_description):
+def generate_questions(job_description, resume, level):
     if USE_FAKE_AI:
         return generate_fake_questions(job_description)
 
-    return generate_ai_questions(job_description)
+    return generate_ai_questions(job_description, resume, level)

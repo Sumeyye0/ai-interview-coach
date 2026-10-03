@@ -12,6 +12,8 @@ app = FastAPI(
 
 class InterviewRequest(BaseModel):
     job_description: str
+    resume: str
+    level: str
 
 
 @app.get("/")
@@ -21,7 +23,11 @@ def root():
 
 @app.post("/generate-questions")
 def create_questions(request: InterviewRequest):
-    questions = generate_questions(request.job_description)
+    questions = generate_questions(
+    request.job_description,
+    request.resume,
+    request.level
+)
 
     return {
         "questions": questions
