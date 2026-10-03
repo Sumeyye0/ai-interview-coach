@@ -1,52 +1,28 @@
-from services.ai_service import generate_questions
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-print("=== AI Interview Coach ===")
+from backend.services.ai_service import generate_questions
 
-job_description = input("Paste the job description: ")
+app = FastAPI(
+    title="AI Interview Coach API",
+    description="Backend API for generating role-specific interview questions.",
+    version="0.1.0"
+)
 
-print("\nJob description received:")
-print(job_description)
 
-prompt = f"""
-You are an AI interview coach.
+class InterviewRequest(BaseModel):
+    job_description: str
 
-The candidate is applying for the following position:
 
-{job_description}
+@app.get("/")
+def root():
+    return {"message": "AI Interview Coach API is running"}
 
-Generate 5 interview questions that are relevant to this position.
-"""
 
-print("\nPrompt sent to AI:")
-print(prompt)
+@app.post("/generate-questions")
+def create_questions(request: InterviewRequest):
+    questions = generate_questions(request.job_description)
 
-def generate_questions(job_description):
-    job_description = job_description.lower()
-
-    if "developer" in job_description:
-        questions = [
-            "Tell me about yourself.",
-            "What programming languages are you most comfortable with?",
-            "Tell me about a technical problem you have solved.",
-            "How do you approach debugging?",
-            "Why are you interested in this developer position?"
-        ]
-
-    else:
-        questions = [
-            "Tell me about yourself.",
-            "Why are you interested in this position?",
-            "What are your greatest strengths?",
-            "Tell me about a challenge you have handled.",
-            "Why should we hire you?"
-        ]
-
-    return questions
-
-interview_questions = generate_questions(job_description)
-
-print("\n=== Interview Questions ===")
-
-for question in interview_questions:
-    print(question)
-    
+    return {
+        "questions": questions
+    }
